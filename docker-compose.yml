@@ -1,0 +1,48 @@
+services:
+
+  # ── PostgreSQL local (solo usado en Docker) ──────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: franchise_db
+    environment:
+      POSTGRES_DB: franchise
+      POSTGRES_USER: franchise_user
+      POSTGRES_PASSWORD: franchise_pass
+    ports:
+      - "5433:5432"   # 5433 en host para no chocar con Postgres local
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - franchise_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U franchise_user -d franchise"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot app ───────────────────────────────────────────────────────────
+  app:
+    build: .
+    container_name: franchise_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy   # espera a que Postgres esté listo
+    environment:
+      # Sobreescribe la config de application.properties apuntando al contenedor "db"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/franchise
+      SPRING_DATASOURCE_USERNAME: franchise_user
+      SPRING_DATASOURCE_PASSWORD: franchise_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+    networks:
+      - franchise_net
+    restart: on-failure
+
+volumes:
+  postgres_data:
+
+networks:
+  franchise_net:
+    driver: bridge
