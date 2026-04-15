@@ -6,15 +6,18 @@ import java.util.List;
 public class Branch {
     private Long id;
     private String name;
+    private Long franchiseId;
     private List<Product> products;
+    private Franchise franchise;
 
-    public Branch(Long id, String name) {
+    public Branch(Long id, String name, Long franchiseId) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Branch name cannot be empty");
         }
         this.id = id;
         this.name = name;
         this.products = new ArrayList<>();
+        this.franchiseId = franchiseId;
     }
 
     public Long getId() {
@@ -31,6 +34,22 @@ public class Branch {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getFranchiseId() {
+        return franchiseId;
+    }
+
+    public void setFranchiseId(Long franchiseId) {
+        this.franchiseId = franchiseId;
+    }
+
+    public Franchise getFranchise() {
+        return franchise;
+    }
+
+    public void setFranchise(Franchise franchise) {
+        this.franchise = franchise;
     }
 
     public List<Product> getProducts() {

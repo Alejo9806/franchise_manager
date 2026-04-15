@@ -1,6 +1,7 @@
 package com.example.franchise_manager.application.branch.usecases;
 
 import com.example.franchise_manager.domain.model.Branch;
+import com.example.franchise_manager.domain.model.Franchise;
 import com.example.franchise_manager.domain.repository.BranchRepository;
 import com.example.franchise_manager.domain.repository.FranchiseRepository;
 
@@ -16,11 +17,13 @@ public class CreateBranchToFranchiseUseCase {
     }
 
     public Branch execute(Long franchiseId, String branchName) {
-        if (franchiseRepository.findById(franchiseId) == null) {
+        Franchise franchise = franchiseRepository.findById(franchiseId);
+        if (franchise == null) {
             throw new IllegalArgumentException("Franchise not found with id: " + franchiseId);
         }
 
-        Branch branch = new Branch(null, branchName);
-        return branchRepository.saveNew(branch, franchiseId);
+        Branch branch = new Branch(null, branchName, franchiseId);
+        franchise.addBranch(branch);
+        return branchRepository.save(branch, franchiseId);
     }
 }

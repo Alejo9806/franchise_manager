@@ -4,33 +4,49 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.franchise_manager.application.product.dto.CreateProductRequest;
 import com.example.franchise_manager.application.product.dto.ProductResponse;
+import com.example.franchise_manager.application.product.dto.UpdateProductNameRequest;
+import com.example.franchise_manager.application.product.dto.UpdateProductStockRequest;
 import com.example.franchise_manager.application.product.usecases.CreateProductToBranchUseCase;
 import com.example.franchise_manager.application.product.usecases.DeleteProductUseCase;
+import com.example.franchise_manager.application.product.usecases.UpdateProductNameUseCase;
 import com.example.franchise_manager.application.product.usecases.UpdateProductStockUseCase;
 import com.example.franchise_manager.domain.model.Product;
 import com.example.franchise_manager.domain.repository.BranchRepository;
+import com.example.franchise_manager.domain.repository.ProductRepository;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    private final CreateProductToBranchUseCase addUseCase;
-    private final UpdateProductStockUseCase updateUseCase;
+    private final CreateProductToBranchUseCase saveUseCase;
+    private final UpdateProductStockUseCase updateStockUseCase;
+    private final UpdateProductNameUseCase updateNameUseCase;
     private final DeleteProductUseCase deleteUseCase;
 
-    public ProductController(BranchRepository repository) {
-        this.addUseCase = new CreateProductToBranchUseCase(repository);
-        this.updateUseCase = new UpdateProductStockUseCase(repository);
-        this.deleteUseCase = new DeleteProductUseCase(repository);
+    public ProductController(ProductRepository productRepository, BranchRepository branchRepository) {
+        this.saveUseCase = new CreateProductToBranchUseCase(productRepository, branchRepository);
+        this.updateStockUseCase = new UpdateProductStockUseCase(productRepository);
+        this.updateNameUseCase = new UpdateProductNameUseCase(productRepository);
+        this.deleteUseCase = new DeleteProductUseCase(productRepository, branchRepository);
     }
 
-    @PostMapping("/branches/{branchId}/products")
-    public ProductResponse add(
+
+    @GetMapping("path")
+    public String getMethodName(@RequestParam String param) {
+        return new String();
+    }
+    
+
+    @PostMapping("/{branchId}")
+    public ProductResponse save(
             @PathVariable Long branchId,
             @Valid @RequestBody CreateProductRequest request) {
 
-        Product product = addUseCase.execute(
+        Product product = saveUseCase.execute(
                 branchId,
                 request.getName(),
                 request.getStock());
@@ -42,25 +58,40 @@ public class ProductController {
                 branchId);
     }
 
-    @PatchMapping("/branches/{branchId}/products/{productId}/stock")
+    @PatchMapping("/{productId}/stock")
     public ProductResponse updateStock(
-            @PathVariable Long branchId,
             @PathVariable Long productId,
-            @RequestParam int stock) {
+            @Valid @RequestBody UpdateProductStockRequest request) {
 
-        Product product = updateUseCase.execute(branchId, productId, stock);
+        Product product = updateStockUseCase.execute(productId, request.getStock());
 
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
                 product.getStock(),
-                branchId);
+                product.getBranchId());
     }
 
-    @DeleteMapping("/branches/{branchId}/products/{productId}")
-    public void delete(
-            @PathVariable Long branchId,
+    @PatchMapping("/{productId}/name")
+    public ProductResponse updateName(
+            @PathVariable Long productId,
+            @Valid @RequestBody UpdateProductNameRequest request) {
+
+        Product product = updateNameUseCase.execute(productId, request.getName());
+
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getStock(),
+                product.getBranchId());
+    }
+
+    @DeleteMapping("/{productId}")
+    public String delete(
             @PathVariable Long productId) {
-        deleteUseCase.execute(branchId, productId);
+
+        deleteUseCase.execute(productId);
+
+        return "Product deleted successfully";
     }
 }

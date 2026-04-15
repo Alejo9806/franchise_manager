@@ -6,7 +6,9 @@ public interface BranchRepository {
 
     Branch findById(Long id);
 
-    Branch saveNew(Branch branch, Long franchiseId);
+    Branch save(Branch branch, Long franchiseId);
 
-    Branch save(Branch branch);
+    Branch update(Long id, String name);
+
+    // Branch saveProduct(Branch branch);
 }

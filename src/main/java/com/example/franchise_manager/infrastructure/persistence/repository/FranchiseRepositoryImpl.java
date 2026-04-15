@@ -1,5 +1,6 @@
 package com.example.franchise_manager.infrastructure.persistence.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.franchise_manager.domain.model.Branch;
 import com.example.franchise_manager.domain.model.Franchise;
+import com.example.franchise_manager.domain.model.Product;
 import com.example.franchise_manager.domain.repository.FranchiseRepository;
 import com.example.franchise_manager.infrastructure.persistence.entity.BranchEntity;
 import com.example.franchise_manager.infrastructure.persistence.entity.FranchiseEntity;
@@ -22,12 +24,25 @@ public class FranchiseRepositoryImpl implements FranchiseRepository {
     @Override
     public Franchise save(Franchise franchise) {
         FranchiseEntity entity = mapToEntity(franchise);
+
+        FranchiseEntity saved = jpaRepository.save(entity);
+        return mapToDomain(saved);
+    }
+
+    @Override
+    public Franchise update(Long id, String name) {
+
+        FranchiseEntity entity = jpaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Franchise not found"));
+
+        entity.setName(name);
         FranchiseEntity saved = jpaRepository.save(entity);
         return mapToDomain(saved);
     }
 
     @Override
     public Franchise findById(Long id) {
+
         return jpaRepository.findById(id)
                 .map(this::mapToDomain)
                 .orElse(null);
@@ -65,7 +80,14 @@ public class FranchiseRepositoryImpl implements FranchiseRepository {
 
         if (entity.getBranches() != null) {
             entity.getBranches().forEach(branchEntity -> {
-                franchise.addBranch(new Branch(branchEntity.getId(), branchEntity.getName()));
+                franchise.addBranch(new Branch(branchEntity.getId(), branchEntity.getName(), entity.getId()));
+                if (branchEntity.getProducts() != null) {
+                    branchEntity.getProducts().forEach(productEntity -> {
+                        franchise.getBranches().get(franchise.getBranches().size() - 1)
+                                .addProduct(new Product(productEntity.getId(), productEntity.getName(),
+                                        productEntity.getStock(), branchEntity.getId()));
+                    });
+                }
             });
         }
 

@@ -8,6 +8,8 @@ public interface FranchiseRepository {
 
     Franchise save(Franchise franchise);
 
+    Franchise update(Long id, String name);
+
     Franchise findById(Long id);
 
     List<Franchise> findAll();

@@ -1,4 +1,4 @@
-package com.example.franchise_manager.application.product.usecases;
+package com.example.franchise_manager.application.franchise.usecases;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +19,17 @@ public class GetTopProductsByFranchiseUseCase {
 
         Franchise franchise = repository.findById(franchiseId);
 
-        List<Product> result = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
 
         for (Branch branch : franchise.getBranches()) {
 
             Product top = branch.getTopStockProduct();
 
             if (top != null) {
-                result.add(top);
+                products.add(top);
             }
         }
 
-        return result;
+        return products;
     }
 }
