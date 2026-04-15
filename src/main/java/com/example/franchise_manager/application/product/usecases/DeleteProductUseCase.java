@@ -22,7 +22,7 @@ public class DeleteProductUseCase {
             throw new IllegalArgumentException("Product not found");
         }
 
-        Branch branch = branchRepository.findById(product.getBranchId());
+        Branch branch = branchRepository.findById(product.getBranch().getId());
 
         if (branch == null) {
             throw new IllegalArgumentException("Branch not found");

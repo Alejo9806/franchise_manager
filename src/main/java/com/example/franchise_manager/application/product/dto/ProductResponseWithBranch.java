@@ -1,14 +1,18 @@
 package com.example.franchise_manager.application.product.dto;
 
-public class ProductResponse {
+import com.example.franchise_manager.application.branch.dto.BranchResponse;
+
+public class ProductResponseWithBranch {
     private Long id;
     private String name;
     private int stock;
+    private BranchResponse branch;
 
-    public ProductResponse(Long id, String name, int stock) {
+    public ProductResponseWithBranch(Long id, String name, int stock, BranchResponse branch) {
         this.id = id;
         this.name = name;
         this.stock = stock;
+        this.branch = branch;
     }
 
     public Long getId() {
@@ -21,5 +25,9 @@ public class ProductResponse {
 
     public int getStock() {
         return stock;
+    }
+
+    public BranchResponse getBranch() {
+        return branch;
     }
 }

@@ -24,7 +24,7 @@ public class CreateProductToBranchUseCase {
             throw new IllegalArgumentException("Branch not found");
         }
 
-        Product product = new Product(null, name, stock, branchId);
+        Product product = new Product(null, name, stock, branch);
         branch.addProduct(product);
         return repository.save(product, branchId);
     }

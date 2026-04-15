@@ -3,6 +3,7 @@ package com.example.franchise_manager.infrastructure.persistence.repository;
 import org.springframework.stereotype.Repository;
 
 import com.example.franchise_manager.domain.model.Branch;
+import com.example.franchise_manager.domain.model.Franchise;
 import com.example.franchise_manager.domain.model.Product;
 import com.example.franchise_manager.domain.repository.BranchRepository;
 import com.example.franchise_manager.infrastructure.persistence.entity.BranchEntity;
@@ -79,11 +80,12 @@ public class BranchRepositoryImpl implements BranchRepository {
     // }
 
     private Branch mapToDomain(BranchEntity entity) {
-        Branch branch = new Branch(entity.getId(), entity.getName(), entity.getFranchise().getId());
+        Branch branch = new Branch(entity.getId(), entity.getName(),
+                new Franchise(entity.getFranchise().getId(), entity.getFranchise().getName()));
 
         if (entity.getProducts() != null) {
             entity.getProducts().forEach(
-                    pe -> branch.addProduct(new Product(pe.getId(), pe.getName(), pe.getStock(), branch.getId())));
+                    pe -> branch.addProduct(new Product(pe.getId(), pe.getName(), pe.getStock(), branch)));
         }
 
         return branch;

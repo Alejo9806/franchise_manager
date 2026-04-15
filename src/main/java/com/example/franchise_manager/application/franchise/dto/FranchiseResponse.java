@@ -2,14 +2,14 @@ package com.example.franchise_manager.application.franchise.dto;
 
 import java.util.List;
 
-import com.example.franchise_manager.application.branch.dto.BranchResponse;
+import com.example.franchise_manager.application.branch.dto.BranchResponseWithProduct;
 
 public class FranchiseResponse {
     private Long id;
     private String name;
-    private List<BranchResponse> branches;
+    private List<BranchResponseWithProduct> branches;
 
-    public FranchiseResponse(Long id, String name, List<BranchResponse> branches) {
+    public FranchiseResponse(Long id, String name, List<BranchResponseWithProduct> branches) {
         this.id = id;
         this.name = name;
         this.branches = branches;
@@ -23,7 +23,7 @@ public class FranchiseResponse {
         return name;
     }
 
-    public List<BranchResponse> getBranches() {
+    public List<BranchResponseWithProduct> getBranches() {
         return branches;
     }
 }

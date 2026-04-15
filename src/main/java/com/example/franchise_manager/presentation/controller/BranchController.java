@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.franchise_manager.application.branch.dto.BranchResponse;
+import com.example.franchise_manager.application.branch.dto.BranchResponseWithProduct;
 import com.example.franchise_manager.application.branch.dto.CreateBranchRequest;
 import com.example.franchise_manager.application.branch.usecases.CreateBranchToFranchiseUseCase;
 import com.example.franchise_manager.application.branch.usecases.UpdateBranchNameUseCase;
@@ -18,46 +19,40 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/branches")
 public class BranchController {
-    private final CreateBranchToFranchiseUseCase createBranchUseCase;
-    private final UpdateBranchNameUseCase updateBranchNameUseCase;
+        private final CreateBranchToFranchiseUseCase createBranchUseCase;
+        private final UpdateBranchNameUseCase updateBranchNameUseCase;
 
-    public BranchController(BranchRepository branchRepository, FranchiseRepository franchiseRepository) {
-        this.createBranchUseCase = new CreateBranchToFranchiseUseCase(franchiseRepository, branchRepository);
-        this.updateBranchNameUseCase = new UpdateBranchNameUseCase(branchRepository);
-    }
+        public BranchController(BranchRepository branchRepository, FranchiseRepository franchiseRepository) {
+                this.createBranchUseCase = new CreateBranchToFranchiseUseCase(franchiseRepository, branchRepository);
+                this.updateBranchNameUseCase = new UpdateBranchNameUseCase(branchRepository);
+        }
 
-    @PostMapping("/{franchiseId}")
-    public BranchResponse save(
-            @PathVariable Long franchiseId,
-            @Valid @RequestBody CreateBranchRequest request) {
+        @PostMapping("/{franchiseId}")
+        public BranchResponse save(
+                        @PathVariable Long franchiseId,
+                        @Valid @RequestBody CreateBranchRequest request) {
 
-        Branch branch = createBranchUseCase.execute(franchiseId, request.getName());
+                Branch branch = createBranchUseCase.execute(franchiseId, request.getName());
 
-        return new BranchResponse(
-                branch.getId(),
-                branch.getName(),
-                franchiseId,
-                branch.getProducts().stream()
-                        .map(product -> new ProductResponse(product.getId(), product.getName(), product.getStock(),
-                                franchiseId))
-                        .collect(Collectors.toList()));
-    }
+                return new BranchResponse(
+                                branch.getId(),
+                                branch.getName());
+        }
 
-    @PatchMapping("/{branchId}")
-    public BranchResponse updateBranch(
-            @PathVariable Long branchId,
-            @Valid @RequestBody CreateBranchRequest request) {
+        @PatchMapping("/{branchId}")
+        public BranchResponseWithProduct updateBranch(
+                        @PathVariable Long branchId,
+                        @Valid @RequestBody CreateBranchRequest request) {
 
-        Branch branch = updateBranchNameUseCase.execute(branchId, request.getName());
+                Branch branch = updateBranchNameUseCase.execute(branchId, request.getName());
 
-        return new BranchResponse(
-                branch.getId(),
-                branch.getName(),
-                branch.getFranchiseId(),
-                branch.getProducts().stream()
-                        .map(product -> new ProductResponse(product.getId(), product.getName(), product.getStock(),
-                                branch.getFranchiseId()))
-                        .collect(Collectors.toList()));
-    }
+                return new BranchResponseWithProduct(
+                                branch.getId(),
+                                branch.getName(),
+                                branch.getProducts().stream()
+                                                .map(product -> new ProductResponse(product.getId(), product.getName(),
+                                                                product.getStock()))
+                                                .collect(Collectors.toList()));
+        }
 
 }

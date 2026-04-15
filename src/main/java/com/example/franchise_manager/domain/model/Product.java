@@ -4,10 +4,9 @@ public class Product {
     private Long id;
     private String name;
     private int stock;
-    private Long branchId;
     private Branch branch;
 
-    public Product(Long id, String name, int stock, Long branchId) {
+    public Product(Long id, String name, int stock, Branch branch) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Product name cannot be empty");
         }
@@ -17,7 +16,7 @@ public class Product {
         this.id = id;
         this.name = name;
         this.stock = stock;
-        this.branchId = branchId;
+        this.branch = branch;
     }
 
     public Long getId() {
@@ -42,14 +41,6 @@ public class Product {
 
     public void setStock(int stock) {
         this.stock = stock;
-    }
-
-    public Long getBranchId() {
-        return branchId;
-    }
-
-    public void setBranchId(Long branchId) {
-        this.branchId = branchId;
     }
 
     public Branch getBranch() {

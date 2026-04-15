@@ -80,12 +80,13 @@ public class FranchiseRepositoryImpl implements FranchiseRepository {
 
         if (entity.getBranches() != null) {
             entity.getBranches().forEach(branchEntity -> {
-                franchise.addBranch(new Branch(branchEntity.getId(), branchEntity.getName(), entity.getId()));
+                franchise.addBranch(new Branch(branchEntity.getId(), branchEntity.getName(), franchise));
                 if (branchEntity.getProducts() != null) {
                     branchEntity.getProducts().forEach(productEntity -> {
                         franchise.getBranches().get(franchise.getBranches().size() - 1)
                                 .addProduct(new Product(productEntity.getId(), productEntity.getName(),
-                                        productEntity.getStock(), branchEntity.getId()));
+                                        productEntity.getStock(),
+                                        new Branch(branchEntity.getId(), branchEntity.getName(), franchise)));
                     });
                 }
             });

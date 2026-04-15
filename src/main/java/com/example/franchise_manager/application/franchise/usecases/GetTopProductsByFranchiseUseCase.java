@@ -3,6 +3,8 @@ package com.example.franchise_manager.application.franchise.usecases;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.franchise_manager.application.branch.dto.BranchResponse;
+import com.example.franchise_manager.application.product.dto.ProductResponseWithBranch;
 import com.example.franchise_manager.domain.model.Branch;
 import com.example.franchise_manager.domain.model.Franchise;
 import com.example.franchise_manager.domain.model.Product;
@@ -15,18 +17,19 @@ public class GetTopProductsByFranchiseUseCase {
         this.repository = repository;
     }
 
-    public List<Product> execute(Long franchiseId) {
+    public List<ProductResponseWithBranch> execute(Long franchiseId) {
 
         Franchise franchise = repository.findById(franchiseId);
 
-        List<Product> products = new ArrayList<>();
+        List<ProductResponseWithBranch> products = new ArrayList<>();
 
         for (Branch branch : franchise.getBranches()) {
 
             Product top = branch.getTopStockProduct();
 
             if (top != null) {
-                products.add(top);
+                products.add(new ProductResponseWithBranch(top.getId(), top.getName(), top.getStock(),
+                        new BranchResponse(branch.getId(), branch.getName())));
             }
         }
 

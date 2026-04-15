@@ -2,6 +2,8 @@ package com.example.franchise_manager.infrastructure.persistence.repository;
 
 import org.springframework.stereotype.Repository;
 
+import com.example.franchise_manager.domain.model.Branch;
+import com.example.franchise_manager.domain.model.Franchise;
 import com.example.franchise_manager.domain.model.Product;
 import com.example.franchise_manager.domain.repository.ProductRepository;
 import com.example.franchise_manager.infrastructure.persistence.entity.BranchEntity;
@@ -33,7 +35,8 @@ public class ProductRepositoryImpl implements ProductRepository {
                 savedProduct.getId(),
                 savedProduct.getName(),
                 savedProduct.getStock(),
-                branchId);
+                new Branch(branch.getId(), branch.getName(),
+                        new Franchise(branch.getFranchise().getId(), branch.getFranchise().getName())));
     }
 
     @Override
@@ -75,7 +78,10 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     private Product mapToDomain(ProductEntity entity) {
-        Product product = new Product(entity.getId(), entity.getName(), entity.getStock(), entity.getBranch().getId());
+        Product product = new Product(entity.getId(), entity.getName(), entity.getStock(),
+                new Branch(entity.getBranch().getId(), entity.getBranch().getName(),
+                        new Franchise(entity.getBranch().getFranchise().getId(),
+                                entity.getBranch().getFranchise().getName())));
 
         return product;
     }

@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.franchise_manager.application.product.dto.CreateProductRequest;
 import com.example.franchise_manager.application.product.dto.ProductResponse;
+import com.example.franchise_manager.application.product.dto.ProductResponseWithBranch;
 import com.example.franchise_manager.application.product.dto.UpdateProductNameRequest;
 import com.example.franchise_manager.application.product.dto.UpdateProductStockRequest;
 import com.example.franchise_manager.application.product.usecases.CreateProductToBranchUseCase;
@@ -17,7 +18,6 @@ import com.example.franchise_manager.domain.repository.ProductRepository;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
 @RequestMapping("/products")
@@ -34,12 +34,10 @@ public class ProductController {
         this.deleteUseCase = new DeleteProductUseCase(productRepository, branchRepository);
     }
 
-
     @GetMapping("path")
     public String getMethodName(@RequestParam String param) {
         return new String();
     }
-    
 
     @PostMapping("/{branchId}")
     public ProductResponse save(
@@ -54,8 +52,7 @@ public class ProductController {
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
-                product.getStock(),
-                branchId);
+                product.getStock());
     }
 
     @PatchMapping("/{productId}/stock")
@@ -68,8 +65,7 @@ public class ProductController {
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
-                product.getStock(),
-                product.getBranchId());
+                product.getStock());
     }
 
     @PatchMapping("/{productId}/name")
@@ -82,8 +78,7 @@ public class ProductController {
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
-                product.getStock(),
-                product.getBranchId());
+                product.getStock());
     }
 
     @DeleteMapping("/{productId}")

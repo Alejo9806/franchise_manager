@@ -22,7 +22,7 @@ public class CreateBranchToFranchiseUseCase {
             throw new IllegalArgumentException("Franchise not found with id: " + franchiseId);
         }
 
-        Branch branch = new Branch(null, branchName, franchiseId);
+        Branch branch = new Branch(null, branchName, franchise);
         franchise.addBranch(branch);
         return branchRepository.save(branch, franchiseId);
     }
