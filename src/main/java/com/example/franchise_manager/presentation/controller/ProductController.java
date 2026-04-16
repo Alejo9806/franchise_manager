@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.franchise_manager.application.product.dto.CreateProductRequest;
 import com.example.franchise_manager.application.product.dto.ProductResponse;
-import com.example.franchise_manager.application.product.dto.ProductResponseWithBranch;
 import com.example.franchise_manager.application.product.dto.UpdateProductNameRequest;
 import com.example.franchise_manager.application.product.dto.UpdateProductStockRequest;
 import com.example.franchise_manager.application.product.usecases.CreateProductToBranchUseCase;
@@ -14,6 +13,7 @@ import com.example.franchise_manager.application.product.usecases.UpdateProductS
 import com.example.franchise_manager.domain.model.Product;
 import com.example.franchise_manager.domain.repository.BranchRepository;
 import com.example.franchise_manager.domain.repository.ProductRepository;
+import com.example.franchise_manager.presentation.mapper.ProductMapper;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,12 +26,15 @@ public class ProductController {
     private final UpdateProductStockUseCase updateStockUseCase;
     private final UpdateProductNameUseCase updateNameUseCase;
     private final DeleteProductUseCase deleteUseCase;
+    private final ProductMapper productMapper;
 
-    public ProductController(ProductRepository productRepository, BranchRepository branchRepository) {
+    public ProductController(ProductRepository productRepository, BranchRepository branchRepository,
+            ProductMapper productMapper) {
         this.saveUseCase = new CreateProductToBranchUseCase(productRepository, branchRepository);
         this.updateStockUseCase = new UpdateProductStockUseCase(productRepository);
         this.updateNameUseCase = new UpdateProductNameUseCase(productRepository);
         this.deleteUseCase = new DeleteProductUseCase(productRepository, branchRepository);
+        this.productMapper = productMapper;
     }
 
     @GetMapping("path")
@@ -49,10 +52,7 @@ public class ProductController {
                 request.getName(),
                 request.getStock());
 
-        return new ProductResponse(
-                product.getId(),
-                product.getName(),
-                product.getStock());
+        return productMapper.productToProductResponse(product);
     }
 
     @PatchMapping("/{productId}/stock")
@@ -62,10 +62,7 @@ public class ProductController {
 
         Product product = updateStockUseCase.execute(productId, request.getStock());
 
-        return new ProductResponse(
-                product.getId(),
-                product.getName(),
-                product.getStock());
+        return productMapper.productToProductResponse(product);
     }
 
     @PatchMapping("/{productId}/name")
@@ -75,10 +72,7 @@ public class ProductController {
 
         Product product = updateNameUseCase.execute(productId, request.getName());
 
-        return new ProductResponse(
-                product.getId(),
-                product.getName(),
-                product.getStock());
+        return productMapper.productToProductResponse(product);
     }
 
     @DeleteMapping("/{productId}")

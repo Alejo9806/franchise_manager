@@ -31,12 +31,8 @@ public class ProductRepositoryImpl implements ProductRepository {
 
         ProductEntity savedProduct = jpaProductRepository.save(productEntity);
 
-        return new Product(
-                savedProduct.getId(),
-                savedProduct.getName(),
-                savedProduct.getStock(),
-                new Branch(branch.getId(), branch.getName(),
-                        new Franchise(branch.getFranchise().getId(), branch.getFranchise().getName())));
+        return mapToDomain(savedProduct);
+
     }
 
     @Override
