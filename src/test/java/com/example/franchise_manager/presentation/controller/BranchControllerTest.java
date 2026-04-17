@@ -15,11 +15,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.example.franchise_manager.application.branch.dto.BranchResponse;
+import com.example.franchise_manager.application.branch.dto.BranchResponseWithProduct;
 import com.example.franchise_manager.application.branch.dto.CreateBranchRequest;
+import com.example.franchise_manager.application.product.dto.ProductResponse;
 import com.example.franchise_manager.domain.model.Branch;
 import com.example.franchise_manager.domain.model.Franchise;
 import com.example.franchise_manager.domain.repository.BranchRepository;
 import com.example.franchise_manager.domain.repository.FranchiseRepository;
+import com.example.franchise_manager.presentation.mapper.BranchMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(BranchController.class)
@@ -37,6 +41,9 @@ public class BranchControllerTest {
     @MockBean
     private FranchiseRepository franchiseRepository;
 
+    @MockBean
+    private BranchMapper branchMapper;
+
     @Test
     void save_ShouldReturnCreatedBranch() throws Exception {
         // Arrange
@@ -49,6 +56,9 @@ public class BranchControllerTest {
 
         when(franchiseRepository.findById(franchiseId)).thenReturn(franchise);
         when(branchRepository.save(any(Branch.class), eq(franchiseId))).thenReturn(branch);
+        
+        BranchResponse response = new BranchResponse(1L, "New Branch");
+        when(branchMapper.branchToBranchResponse(any())).thenReturn(response);
 
         // Act & Assert
         mockMvc.perform(post("/branches/{franchiseId}", franchiseId)
@@ -75,6 +85,10 @@ public class BranchControllerTest {
 
         when(branchRepository.findById(branchId)).thenReturn(branch);
         when(branchRepository.update(branchId, "Updated Branch")).thenReturn(branch);
+
+        BranchResponseWithProduct response = new BranchResponseWithProduct(1L, "Updated Branch",
+                java.util.Collections.singletonList(new ProductResponse(1L, "Product A", 10)));
+        when(branchMapper.branchToBranchResponseWithProduct(any())).thenReturn(response);
 
         // Act & Assert
         mockMvc.perform(patch("/branches/{branchId}", branchId)

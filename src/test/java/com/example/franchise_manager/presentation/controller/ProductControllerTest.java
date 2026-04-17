@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.example.franchise_manager.application.product.dto.CreateProductRequest;
+import com.example.franchise_manager.application.product.dto.ProductResponse;
 import com.example.franchise_manager.application.product.dto.UpdateProductNameRequest;
 import com.example.franchise_manager.application.product.dto.UpdateProductStockRequest;
 import com.example.franchise_manager.domain.model.Branch;
@@ -26,6 +27,7 @@ import com.example.franchise_manager.domain.model.Franchise;
 import com.example.franchise_manager.domain.model.Product;
 import com.example.franchise_manager.domain.repository.BranchRepository;
 import com.example.franchise_manager.domain.repository.ProductRepository;
+import com.example.franchise_manager.presentation.mapper.ProductMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(ProductController.class)
@@ -42,6 +44,9 @@ public class ProductControllerTest {
 
     @MockBean
     private BranchRepository branchRepository;
+
+    @MockBean
+    private ProductMapper productMapper;
 
     @Test
     void getMethodName_ShouldReturnEmptyString() throws Exception {
@@ -65,6 +70,9 @@ public class ProductControllerTest {
 
         when(branchRepository.findById(branchId)).thenReturn(branch);
         when(productRepository.save(any(Product.class), eq(branchId))).thenReturn(product);
+
+        ProductResponse response = new ProductResponse(1L, "New Product", 50);
+        when(productMapper.productToProductResponse(any())).thenReturn(response);
 
         // Act & Assert
         mockMvc.perform(post("/products/{branchId}", branchId)
@@ -91,6 +99,9 @@ public class ProductControllerTest {
         when(productRepository.findById(productId)).thenReturn(product);
         when(productRepository.updateStock(productId, 100)).thenReturn(updatedProduct);
 
+        ProductResponse response = new ProductResponse(1L, "Product 1", 100);
+        when(productMapper.productToProductResponse(any())).thenReturn(response);
+
         // Act & Assert
         mockMvc.perform(patch("/products/{productId}/stock", productId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -115,6 +126,9 @@ public class ProductControllerTest {
         when(productRepository.findById(productId)).thenReturn(product);
         when(productRepository.updateName(productId, "Updated Product")).thenReturn(updatedProduct);
 
+        ProductResponse response = new ProductResponse(1L, "Updated Product", 50);
+        when(productMapper.productToProductResponse(any())).thenReturn(response);
+
         // Act & Assert
         mockMvc.perform(patch("/products/{productId}/name", productId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -129,7 +143,7 @@ public class ProductControllerTest {
         // Arrange
         Long productId = 1L;
         Long branchId = 1L;
-        
+
         Franchise franchise = new Franchise(1L, "Franchise 1");
         Branch branch = new Branch(branchId, "Branch 1", franchise);
         Product product = new Product(productId, "Product 1", 50, branch);
@@ -137,7 +151,7 @@ public class ProductControllerTest {
 
         when(productRepository.findById(productId)).thenReturn(product);
         when(branchRepository.findById(branchId)).thenReturn(branch);
-        
+
         // Act & Assert
         mockMvc.perform(delete("/products/{productId}", productId))
                 .andExpect(status().isOk())

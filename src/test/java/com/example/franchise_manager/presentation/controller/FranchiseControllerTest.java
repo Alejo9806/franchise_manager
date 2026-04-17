@@ -18,12 +18,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.example.franchise_manager.application.branch.dto.BranchResponseWithProduct;
 import com.example.franchise_manager.application.franchise.dto.CreateFranchiseRequest;
+import com.example.franchise_manager.application.franchise.dto.FranchiseResponse;
 import com.example.franchise_manager.domain.model.Branch;
 import com.example.franchise_manager.domain.model.Franchise;
 import com.example.franchise_manager.domain.model.Product;
 import com.example.franchise_manager.domain.repository.BranchRepository;
 import com.example.franchise_manager.domain.repository.FranchiseRepository;
+import com.example.franchise_manager.presentation.mapper.FranchiseMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(FranchiseController.class)
@@ -41,6 +44,9 @@ public class FranchiseControllerTest {
     @MockBean
     private BranchRepository branchRepository;
 
+    @MockBean
+    private FranchiseMapper franchiseMapper;
+
     @Test
     void createFranchise_ShouldReturnCreatedFranchise() throws Exception {
         // Arrange
@@ -50,6 +56,9 @@ public class FranchiseControllerTest {
         Franchise franchise = new Franchise(1L, "New Franchise");
 
         when(franchiseRepository.save(any(Franchise.class))).thenReturn(franchise);
+        
+        FranchiseResponse response = new FranchiseResponse(1L, "New Franchise", null);
+        when(franchiseMapper.franchiseToFranchiseResponse(any())).thenReturn(response);
 
         // Act & Assert
         mockMvc.perform(post("/franchises")
@@ -90,6 +99,10 @@ public class FranchiseControllerTest {
         franchise.addBranch(branch);
 
         when(franchiseRepository.findAll()).thenReturn(Arrays.asList(franchise));
+        
+        FranchiseResponse response = new FranchiseResponse(1L, "Franchise 1",
+                Arrays.asList(new BranchResponseWithProduct(1L, "Branch 1", null)));
+        when(franchiseMapper.franchiseToFranchiseResponse(any())).thenReturn(response);
 
         // Act & Assert
         mockMvc.perform(get("/franchises"))
@@ -111,6 +124,9 @@ public class FranchiseControllerTest {
 
         when(franchiseRepository.findById(franchiseId)).thenReturn(franchise);
         when(franchiseRepository.update(franchiseId, "Updated Franchise")).thenReturn(updatedFranchise);
+
+        FranchiseResponse response = new FranchiseResponse(1L, "Updated Franchise", null);
+        when(franchiseMapper.franchiseToFranchiseResponse(any())).thenReturn(response);
 
         // Act & Assert
         mockMvc.perform(patch("/franchises/{id}", franchiseId)
